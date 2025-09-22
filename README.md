@@ -2,10 +2,10 @@
 
 <img src="assets/badge.png" width=120%>
 
-[![Live Demo](https://img.shields.io/badge/demo-online-blue?style=for-the-badge&logo=rubiks-cube)](https://h4cxel.github.io/Decuber)
+[![Live Demo](https://img.shields.io/badge/demo-online-blue?style=for-the-badge&logo=rubiks-cube)](https://h4ckxel.github.io/Decuber)
 [![Python](https://img.shields.io/badge/python-3.x-yellow?style=for-the-badge&logo=python)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
-[![Status](https://img.shields.io/badge/status-side_project-purple?style=for-the-badge&logo=github)](https://github.com/h4cxel/Decuber)
+[![Status](https://img.shields.io/badge/status-side_project-purple?style=for-the-badge&logo=github)](https://github.com/h4ckxel/Decuber)
 
 </div>
 
@@ -27,7 +27,7 @@ Puedes usarlo para:
 
 ## 🔗 Demo en Vivo
 
-👉 [Prueba Decuber aquí](https://h4cxel.github.io/Decuber)
+👉 [Prueba Decuber aquí](https://h4ckxel.github.io/Decuber)
 
 ![screenshot](assets/screenshot.png)
 
@@ -106,7 +106,7 @@ Salida:
 ./DecubeBase36.py -i demo.zip
 ```
 
-➡️ Pega el resultado en el [Decuber visual encoder](https://h4cxkel.github.io/Decuber), arma tus cubos y compártelos.
+➡️ Pega el resultado en el [Decuber visual encoder](https://h4ckxel.github.io/Decuber), arma tus cubos y compártelos.
 
 ---
 
