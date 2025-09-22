@@ -106,7 +106,7 @@ Salida:
 ./DecubeBase36.py -i demo.zip
 ```
 
-➡️ Pega el resultado en el [Decuber visual encoder](https://h4cxel.github.io/Decuber), arma tus cubos y compártelos.
+➡️ Pega el resultado en el [Decuber visual encoder](https://h4cxkel.github.io/Decuber), arma tus cubos y compártelos.
 
 ---
 
