@@ -1,52 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Encode hidden messages in Rubik's Cube faces.">
-        <title>Decuber | h4ckxel</title>
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="icon" href="assets/favicon.png">
-    </head>
-    <body>
-    
-        <center>
-            <div class="tabs">
-                <button class="tab-button active" onclick="showTab('encoder')">Encoder</button>
-                <button class="tab-button" onclick="showTab('decoder')">Decoder</button>
-            </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Encode hidden messages in Rubik's Cube faces.">
+  <title>Decuber | h4ckxel</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/favicon.png">
+</head>
+<body>
+  <center>
+    <!-- tabs -->
+    <div class="tabs">
+      <button class="tab-button active" onclick="showTab('encoder')">🟥 Encoder</button>
+      <button class="tab-button" onclick="showTab('decoder')">🟩 Decoder</button>
+    </div>
 
-        <div class="tab active" id="encoder">
-            <h2>Decuber: Cube Encoder</h2>
-            <p>Enter message (a–z, space, . ! ? @ # : / ( ) ):</p>
-            <input type="text" id="message" placeholder="hello world" oninput="encode()">
-            <div class="error" id="encodeError"></div>
-            <div class="faces" id="faces"></div>
-            <h3>Encoded Color Codes:</h3>
-            <textarea id="colorCodes" rows="4" readonly></textarea>
-            <br>
-            <button onclick="copyColorCodes()">Copy All</button>
-            <button onclick="resetEncoder()">Clear</button>
-        </div>
+    <!-- encoder -->
+    <div class="tab active" id="encoder">
+      <h2>🟦 Decuber: Cube Encoder</h2>
+      <p>Enter message <code>(a–z, space, . ! ? @ # : / ( ) )</code>:</p>
+      <input type="text" id="message" placeholder="hello world" oninput="encode()">
+      <div class="error" id="encodeError"></div>
+      <div class="faces" id="faces"></div>
 
-        <div class="tab" id="decoder">
-            <h2>Decube: Cube Decoder</h2>
-            <p>Enter color sequences (e.g. <code>rbwywbwbw bgwwwgybg gwbwwwoww</code>):</p>
-            <textarea id="colorInput" rows="3" oninput="autoSpaceAndDecode(this)"></textarea>
-            <div class="error" id="decodeErrors"></div>
-            <div class="output" id="decodedOutput"></div>
-            <button onclick="resetDecoder()">Clear</button>
-            <div class="faces" id="decodedFaces"></div>
-        </div>
-        
-        <footer>
-            <p>
-                Created by <a href="mailto:h4ckxel@gmail.com">h4ckxel</a> -
-                <a href="https://github.com/h4ckxel/Decuber">GitHub</a>
-            </p>
-        </footer>
+      <h3>Encoded Color Codes:</h3>
+      <textarea id="colorCodes" rows="4" readonly></textarea>
+      <br>
+      <button onclick="copyColorCodes()">📋 Copy All</button>
+      <button onclick="resetEncoder()">🗑 Clear</button>
+    </div>
 
-        <script src="js/script.js"></script>
-    </center>
-    </body>
+    <!-- decoder -->
+    <div class="tab" id="decoder">
+      <h2>🟨 Decuber: Cube Decoder</h2>
+      <p>Enter color sequences (e.g. 
+        <code>rbwywbwbw bgwwwgybg gwbwwwoww</code>):</p>
+      <textarea id="colorInput" rows="3" oninput="autoSpaceAndDecode(this)"></textarea>
+      <div class="error" id="decodeErrors"></div>
+      <div class="output" id="decodedOutput"></div>
+      <button onclick="resetDecoder()">🗑 Clear</button>
+      <div class="faces" id="decodedFaces"></div>
+    </div>
+
+    <!-- footer -->
+    <footer>
+      <p>
+        Made with 🧩 by <a href="mailto:h4ckxel@gmail.com">h4ckxel</a> — 
+        <a href="https://github.com/h4ckxel/Decuber">GitHub</a>
+      </p>
+    </footer>
+  </center>
+  <script src="js/script.js"></script>
+</body>
 </html>
