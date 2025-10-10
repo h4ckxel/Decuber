@@ -9,6 +9,7 @@
 
 </div>
 
+
 ---
 
 **Decuber** es una herramienta web para codificar mensajes en patrones de colores de un cubo de Rubik.
