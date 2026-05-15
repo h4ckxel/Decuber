@@ -52,6 +52,7 @@ Puedes usarlo para:
 
 ## 🧠 Cómo Funciona
 
+
 * Cada carácter se convierte en un **par de colores**.
 
 * Como hay 6 colores estándar, tenemos `6 × 6 = 36` combinaciones → suficiente para:
