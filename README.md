@@ -1,201 +1,204 @@
 <div align="center">
 
-<img src="assets/badge.png" width=120%>
+<img src="assets/badge.png" alt="Decuber banner" width="100%">
 
-[![Live Demo](https://img.shields.io/badge/demo-online-blue?style=for-the-badge&logo=rubiks-cube)](https://h4ckxel.github.io/Decuber)
-[![Python](https://img.shields.io/badge/python-3.x-yellow?style=for-the-badge&logo=python)](https://www.python.org/)
-[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
-[![Status](https://img.shields.io/badge/status-side_project-purple?style=for-the-badge&logo=github)](https://github.com/h4ckxel/Decuber)
+# DECUBER
+
+Rubik cube color codec for hiding short messages in 3x3 color faces.
+
+[![Live Demo](https://img.shields.io/badge/demo-GitHub%20Pages-1167d8?style=for-the-badge)](https://h4ckxel.github.io/Decuber)
+[![Python](https://img.shields.io/badge/python-3.x-ffe100?style=for-the-badge&logo=python)](https://www.python.org/)
+[![Tests](https://img.shields.io/badge/tests-unittest-00b86b?style=for-the-badge)](#testing)
+[![License](https://img.shields.io/badge/license-MIT-ff2bd6?style=for-the-badge)](LICENSE)
 
 </div>
 
 ---
 
-**Decuber** es una herramienta web para codificar mensajes en patrones de colores de un cubo de Rubik.
+## Descripcion Corta
 
-Puedes usarlo para:
+Decuber convierte texto en secuencias de colores inspiradas en un cubo Rubik. Cada bloque se muestra como una cara 3x3 con centro blanco, lista para copiarse como codigo de colores o recrearse visualmente.
 
-* compartir mensajes secretos con amigos cuberos
-* esconder *easter eggs* en fotos o videos
-* añadir pistas en *escape rooms* o geocaching
-* mandar felicitaciones nerd en cubos reales
-* usarlo como reto en sesiones de speedcubing
-* dejar notas ocultas en cubos de escritorio
-* confundir gente por diversión 🤓
+Tambien incluye `DecuberBase36.py`, un CLI sin dependencias externas para codificar y decodificar bytes, streams y archivos usando simbolos compatibles con el alfabeto visual de Decuber.
 
----
+> Decuber no es cifrado seguro. Sirve para puzzles, estetica visual, retos de cubing y mensajes ocultos casuales. No lo uses para proteger secretos reales sin una capa criptografica externa.
 
-## 🔗 Demo en Vivo
+## Demo
 
-👉 [Prueba Decuber aquí](https://h4ckxel.github.io/Decuber)
+Demo publica: [h4ckxel.github.io/Decuber](https://h4ckxel.github.io/Decuber)
 
-![screenshot](assets/screenshot.png)
+![Decuber screenshot](assets/screenshot.png)
 
----
+## Que Hace Decuber
 
-## ⚠️ Qué Es / Qué No Es
+- Codifica mensajes cortos en caras de cubo Rubik 3x3.
+- Decodifica secuencias de iniciales de color en vivo.
+- Muestra el resultado visualmente como matrices de cubos.
+- Mantiene una version CLI para texto, bytes, stdin/stdout y archivos.
+- Funciona en GitHub Pages con HTML, CSS y JavaScript vanilla.
 
-✅ **Es**:
+## Como Funciona El Algoritmo De Colores
 
-* Una forma divertida de codificar y decodificar mensajes usando 6 colores de cubo
-* Un side project curioso inspirado en el cubing
-* Útil para puzzles, geocaches, bromas y notas ocultas
-* Un codificador visual simple
+La version web usa este alfabeto:
 
-❌ **No es**:
+```text
+ abcdefghijklmnopqrstuvwxyz.!?@#:/()
+```
 
-* Un método de cifrado seguro
-* Una herramienta seria de esteganografía
-* Para proteger datos sensibles
+Hay 6 colores base:
 
----
+```text
+white red blue green orange yellow
+```
 
-## 🧠 Cómo Funciona
+Con `6 x 6 = 36` pares posibles, Decuber asigna cada caracter soportado a un par de colores. Una cara 3x3 guarda 4 caracteres:
 
+- Los 8 stickers externos contienen 8 colores.
+- Cada 2 colores representan 1 caracter.
+- El centro siempre es blanco.
+- El orden de lectura es izquierda a derecha, de arriba hacia abajo, saltando el centro.
 
-* Cada carácter se convierte en un **par de colores**.
+Ejemplo conceptual:
 
-* Como hay 6 colores estándar, tenemos `6 × 6 = 36` combinaciones → suficiente para:
+```text
+mensaje -> pares de colores -> cara 3x3 -> codigo de iniciales
+```
 
-  * 26 letras (`a–z`)
-  * espacio
-  * 9 caracteres especiales: `. ! ? @ # : / ( )`
+## Uso Web
 
-* El cubo se representa en una **cara 3×3**:
+1. Abre la demo o `index.html` localmente.
+2. Escribe un mensaje en `ENCODE.EXE`.
+3. Copia la secuencia generada, por ejemplo `rbwywbwbw`.
+4. Pega la secuencia en `DECODE.EXE` para recuperar el texto.
 
-  * El centro siempre es **blanco**
-  * Los 8 campos alrededor se rellenan de arriba-izquierda a abajo-derecha
-  * Cada 2 colores = 1 carácter
-  * Una cara almacena **4 caracteres**
+Caracteres soportados por la web:
 
-### 🧭 Convención de Orientación
+```text
+a-z, espacio, . ! ? @ # : / ( )
+```
 
-* La cara de mensaje siempre tiene centro blanco
-* El centro superior es verde
-* (Pero puedes orientarlo como quieras)
+## Uso CLI Con DecuberBase36.py
 
----
-
-## 🔄 CLI: Codificar Archivos, Texto o Streams
-
-El script `DecubeBase36.py` extiende Decuber para manejar **cualquier dato binario** (texto, fotos, audios, ZIPs).
-
-Cada byte se convierte a un alfabeto base36 → y de ahí a colores del cubo.
-
----
-
-### 📦 Calcular Cubos Necesarios
+El script real se llama:
 
 ```bash
-./DecubeBase36.py -i demo.zip -s
+DecuberBase36.py
+```
+
+Codificar texto directo:
+
+```bash
+python DecuberBase36.py "hello world"
+```
+
+Salida real:
+
+```text
+v:c)c:dddddga/dodgdjddc#
+```
+
+Decodificar esa salida:
+
+```bash
+python DecuberBase36.py -d "v:c)c:dddddga/dodgdjddc#"
+```
+
+Codificar un archivo:
+
+```bash
+python DecuberBase36.py -i demo.zip -o encoded.txt
+```
+
+Recuperar el archivo:
+
+```bash
+python DecuberBase36.py -d -i encoded.txt -o recovered.zip
+```
+
+Usar stdin/stdout:
+
+```bash
+cat demo.bin | python DecuberBase36.py > encoded.txt
+python DecuberBase36.py -d -i encoded.txt -o recovered.bin
+```
+
+Ver resumen de tamano:
+
+```bash
+python DecuberBase36.py -s "hello"
 ```
 
 Salida:
 
-```
-📦 File Summary:
-- File size: 487 Bytes (3896 bits)
-- Encoded length: 754 characters (Base36)
-- Needed cubes: 189 (1 face per cube, 4 chars each)
+```text
+File Summary:
+- File size: 5 Bytes (40 bits)
+- Encoded length: 12 characters
+- Needed cubes: 3 (1 face per cube, 4 characters each)
 ```
 
----
+### Nota Sobre El Formato CLI
 
-### 🔐 Codificar un Archivo
+Las salidas nuevas del CLI empiezan con `v:`. Ese prefijo permite round-trip correcto de:
+
+- entrada vacia,
+- bytes nulos,
+- archivos binarios,
+- stdin/stdout,
+- texto normal.
+
+El decodificador tambien acepta cadenas antiguas sin prefijo cuando sean validas para el formato numerico previo.
+
+## Instalacion Y Ejecucion Local
+
+Clona el repositorio:
 
 ```bash
-./DecubeBase36.py -i demo.zip
+git clone https://github.com/h4ckxel/Decuber.git
+cd Decuber
 ```
 
-➡️ Pega el resultado en el [Decuber visual encoder](https://h4ckxel.github.io/Decuber), arma tus cubos y compártelos.
-
----
-
-### 🔓 Decodificar un Archivo
+Abrir la web:
 
 ```bash
-./DecubeBase36.py -d -i encoded.txt -o recovered.zip
+# Opcion simple: abre index.html en tu navegador
 ```
 
----
-
-### ⚙️ Otros Ejemplos
+Ejecutar CLI:
 
 ```bash
-./DecubeBase36.py "hello world"      # codifica un string
-./DecubeBase36.py -d "abcxyz123..."  # decodifica un string
-cat file | ./DecubeBase36.py         # codifica desde stdin
-echo "xyz..." | ./DecubeBase36.py -d # decodifica desde pipe
+python DecuberBase36.py "hello world"
 ```
 
----
+No hay dependencias externas para el CLI. La web usa HTML, CSS y JavaScript vanilla.
 
-## 🛡 Uso con Cifrado (Opcional)
+## Testing
 
-Puedes combinarlo con **OpenSSL** para mensajes seguros:
+Ejecuta la suite automatizada:
 
 ```bash
-echo "mysecret" \
-| openssl enc -aes-256-cbc -pbkdf2 \
-| ./DecubeBase36.py
+python -m unittest discover -s tests
 ```
 
-Salida ejemplo:
+La suite cubre:
 
-```
-bb?kdvosq#dy?jlh#x@lztqzug@rgknyke:m!a#cl:ulfwzdj(
-```
+- round-trip de bytes, texto y binarios,
+- bytes nulos,
+- entrada vacia,
+- archivos pequenos,
+- stdin/stdout,
+- caracteres invalidos al decodificar,
+- calculo de cubos necesarios en modo summary.
 
-### 🔓 Decodificar + Desencriptar
+## Roadmap
 
-```bash
-./DecubeBase36.py -d 'bb?kdvosq#...' \
-| openssl enc -d -aes-256-cbc -pbkdf2
-```
+- Exportar imagenes de las caras generadas.
+- Mejorar impresion de plantillas para cubos fisicos.
+- Agregar mas presets visuales sin romper GitHub Pages.
+- Documentar mejor compatibilidad entre web visual y CLI binario.
 
----
+## Licencia
 
-## 📥 Requisitos
+MIT License. Ver [LICENSE](LICENSE).
 
-* Python 3.x
-* Sin dependencias externas
-* Funciona en Linux, macOS, WSL, etc.
-
-Hazlo ejecutable:
-
-```bash
-chmod +x DecubeBase36.py
-```
-
-O ejecútalo con:
-
-```bash
-python3 DecubeBase36.py
-```
-
----
-
-## 🗺 Roadmap / Ideas Futuras
-
-* Codificación optimizada para almacenar más de 4 caracteres por cara
-* Soporte de emojis o sets de caracteres extendidos
-* Codificación gráfica completa (guardar imágenes dentro de cubos)
-* Generación automática de secuencias de scramble para reproducir mensajes
-
----
-
-## 👋 Motivación
-
-Una tarde de domingo, mientras practicaba speedcubing, me pregunté:
-**“¿Podría esconder un mensaje dentro de un cubo de Rubik?”**
-
-Pocas horas después nació Decuber: rápido, imperfecto, pero divertido.
-Sí, sé que se puede optimizar mucho más — pero esa es la magia de un buen *side project*.
-
----
-
-## 📜 Licencia
-
-MIT License — úsalo, modifícalo y compártelo libremente.
-
----
+Proyecto original: StegaCube by Christian Lepuschitz. Modificaciones: h4ckxel.
