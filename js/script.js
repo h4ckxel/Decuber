@@ -1,141 +1,248 @@
 /* ======================================
-   DECUBER — script.js
-   h4ckxel :: cube cipher engine
-   90s edition
+   DECUBER - cube cipher engine and Y2K UI
+   Public codec hooks stay stable for GitHub Pages.
    ====================================== */
 
-// ── BOOT SEQUENCE ──────────────────────
+const INTRO_DURATION_MS = 2850;
 const bootLines = [
-  { text: "DECUBER CIPHER SYSTEM v2.0", cls: "" },
-  { text: "Copyright (C) 1998 h4ckxel. All Rights Reserved.", cls: "" },
-  { text: "", cls: "" },
-  { text: "Checking memory............. 640K OK", cls: "" },
-  { text: "Loading CUBE_MAP.SYS........ OK", cls: "log-ok" },
-  { text: "Loading COLOR_ALPHA.DLL..... OK", cls: "log-ok" },
-  { text: "Initializing cipher engine.. OK", cls: "log-ok" },
-  { text: "Mounting /dev/cube0......... OK", cls: "log-ok" },
-  { text: "Checking entropy source..... /dev/urandom", cls: "" },
-  { text: "WARNING: Channel not encrypted. Proceed with caution.", cls: "log-warn" },
-  { text: "", cls: "" },
-  { text: "System ready. Launching DECUBER.EXE...", cls: "log-ok" },
+  { text: "DECUBER CIPHER SYSTEM v2.3", cls: "" },
+  { text: "Loading COLOR_ALPHA.DLL", cls: "log-ok" },
+  { text: "Mounting /dev/cube0", cls: "log-ok" },
+  { text: "Scanning sticker bus: W R B G O Y", cls: "log-ok" },
+  { text: "Assembling 3x3 matrix", cls: "log-ok" },
+  { text: "WARNING: visual codec is not encryption", cls: "log-warn" },
+  { text: "Launching DECUBER.EXE", cls: "log-ok" },
 ];
 
+let appStarted = false;
+let statusTimer = null;
+let clockTimer = null;
+
 window.addEventListener("DOMContentLoaded", () => {
-  const logEl      = document.getElementById("bootLog");
-  const bootScreen = document.getElementById("bootScreen");
-  const mainContent= document.getElementById("mainContent");
-  let i = 0;
-
-  function typeLine() {
-    if (i >= bootLines.length) {
-      setTimeout(() => {
-        bootScreen.classList.add("fade-out");
-        mainContent.classList.remove("hidden");
-        // después del wipe, ocultar
-        setTimeout(() => bootScreen.style.display = "none", 600);
-        startClock();
-        setSessionId();
-        initScrollReveal();
-        startStatusCycle();
-      }, 500);
-      return;
-    }
-    const { text, cls } = bootLines[i++];
-    const span = document.createElement("span");
-    span.className = "log-line " + cls;
-    span.textContent = text ? "> " + text : " ";
-    logEl.appendChild(span);
-    logEl.scrollTop = logEl.scrollHeight;
-    // velocidad irregular — más auténtico
-    const delay = text === "" ? 40 : 80 + Math.random() * 100;
-    setTimeout(typeLine, delay);
-  }
-
-  setTimeout(typeLine, 400);
+  initIntro();
 });
 
-// ── CLOCK ──────────────────────────────
+// Intro is isolated so encode/decode behavior can remain boring and stable.
+function initIntro() {
+  const bootScreen = document.getElementById("bootScreen");
+  const skipButton = document.getElementById("skipIntro");
+  const progress = document.getElementById("bootProgress");
+
+  if (!bootScreen) {
+    startAppModules();
+    return;
+  }
+
+  buildIntroCube();
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const timers = [];
+
+  function addTimer(fn, delay) {
+    const id = setTimeout(fn, delay);
+    timers.push(id);
+    return id;
+  }
+
+  function finish(skipped = false) {
+    timers.forEach(clearTimeout);
+    revealApp(skipped);
+  }
+
+  if (skipButton) {
+    skipButton.addEventListener("click", () => finish(true));
+  }
+
+  if (reducedMotion) {
+    bootLines.forEach(addBootLine);
+    if (progress) progress.style.width = "100%";
+    addTimer(() => finish(false), 650);
+    return;
+  }
+
+  bootLines.forEach((line, index) => {
+    addTimer(() => {
+      addBootLine(line);
+      if (progress) {
+        const pct = Math.round(((index + 1) / bootLines.length) * 100);
+        progress.style.width = `${pct}%`;
+      }
+    }, 240 + index * 245);
+  });
+
+  addTimer(() => finish(false), INTRO_DURATION_MS);
+}
+
+function buildIntroCube() {
+  const cube = document.getElementById("introCube");
+  if (!cube) return;
+
+  const pieces = [
+    ["#FFFFFF", "-280px", "-150px", "160px", "160deg", "-70deg", "-120deg"],
+    ["#C41E3A", "40px", "-250px", "210px", "-130deg", "110deg", "80deg"],
+    ["#0051BA", "280px", "-120px", "190px", "80deg", "-160deg", "160deg"],
+    ["#009E60", "-320px", "20px", "140px", "-210deg", "70deg", "-60deg"],
+    ["#FFFFFF", "0px", "0px", "260px", "250deg", "120deg", "240deg"],
+    ["#FF5800", "320px", "40px", "150px", "-80deg", "-220deg", "90deg"],
+    ["#FFD500", "-220px", "230px", "180px", "120deg", "180deg", "-180deg"],
+    ["#C41E3A", "10px", "300px", "220px", "-160deg", "-90deg", "210deg"],
+    ["#0051BA", "250px", "230px", "170px", "210deg", "60deg", "-240deg"],
+  ];
+
+  cube.innerHTML = "";
+  pieces.forEach(([color, x, y, z, spinX, spinY, spinZ], index) => {
+    const piece = document.createElement("span");
+    piece.className = "intro-cubie";
+    piece.style.setProperty("--piece-color", color);
+    piece.style.setProperty("--fly-x", x);
+    piece.style.setProperty("--fly-y", y);
+    piece.style.setProperty("--fly-z", z);
+    piece.style.setProperty("--spin-x", spinX);
+    piece.style.setProperty("--spin-y", spinY);
+    piece.style.setProperty("--spin-z", spinZ);
+    piece.style.setProperty("--delay", `${120 + index * 82}ms`);
+    cube.appendChild(piece);
+  });
+}
+
+function addBootLine(line) {
+  const logEl = document.getElementById("bootLog");
+  if (!logEl) return;
+
+  const span = document.createElement("span");
+  span.className = `log-line ${line.cls}`;
+  span.textContent = `> ${line.text}`;
+  logEl.appendChild(span);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function revealApp(skipped = false) {
+  if (appStarted) return;
+  appStarted = true;
+
+  const bootScreen = document.getElementById("bootScreen");
+  const mainContent = document.getElementById("mainContent");
+  const progress = document.getElementById("bootProgress");
+
+  if (progress) progress.style.width = "100%";
+  if (mainContent) mainContent.classList.remove("hidden");
+  if (bootScreen) {
+    bootScreen.classList.add("fade-out");
+    bootScreen.dataset.skipped = skipped ? "true" : "false";
+    setTimeout(() => {
+      bootScreen.style.display = "none";
+    }, 760);
+  }
+
+  startAppModules();
+}
+
+function startAppModules() {
+  startClock();
+  setSessionId();
+  initScrollReveal();
+  startStatusCycle();
+}
+
 function startClock() {
   const el = document.getElementById("clockDisplay");
+  if (!el) return;
+
   function tick() {
-    const n  = new Date();
-    const hh = String(n.getHours()).padStart(2,"0");
-    const mm = String(n.getMinutes()).padStart(2,"0");
-    const ss = String(n.getSeconds()).padStart(2,"0");
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, "0");
+    const mm = String(now.getMinutes()).padStart(2, "0");
+    const ss = String(now.getSeconds()).padStart(2, "0");
     el.textContent = `${hh}:${mm}:${ss}`;
   }
+
   tick();
-  setInterval(tick, 1000);
+  clearInterval(clockTimer);
+  clockTimer = setInterval(tick, 1000);
 }
 
-// ── SESSION ID ─────────────────────────
 function setSessionId() {
-  const id = Math.random().toString(36).substring(2, 8).toUpperCase();
-  document.getElementById("sessionId").textContent = id;
+  const el = document.getElementById("sessionId");
+  if (!el) return;
+  el.textContent = Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
-// ── STATUS CYCLE ───────────────────────
-const statuses = ["SYS_ONLINE", "CIPHER_RDY", "CUBE_ACTIVE", "ENCODING.."];
-let si = 0;
+const statuses = ["SYS_ONLINE", "CIPHER_RDY", "CUBE_ACTIVE", "COLOR_BUS", "DECODE_OK"];
+let statusIndex = 0;
+
 function startStatusCycle() {
-  setInterval(() => {
-    si = (si + 1) % statuses.length;
-    const el = document.getElementById("statusText");
-    if (el) {
-      // Parpadeo previo al cambio — 90s
-      el.style.opacity = "0";
-      setTimeout(() => {
-        el.textContent = statuses[si];
-        el.style.opacity = "1";
-      }, 200);
-    }
+  const el = document.getElementById("statusText");
+  if (!el) return;
+
+  clearInterval(statusTimer);
+  statusTimer = setInterval(() => {
+    statusIndex = (statusIndex + 1) % statuses.length;
+    el.style.opacity = "0";
+    setTimeout(() => {
+      el.textContent = statuses[statusIndex];
+      el.style.opacity = "1";
+    }, 160);
   }, 3000);
 }
 
-// ── SCROLL REVEAL ──────────────────────
 function initScrollReveal() {
   const els = document.querySelectorAll(".reveal-on-scroll");
   if (!("IntersectionObserver" in window)) {
     els.forEach(el => el.classList.add("visible"));
     return;
   }
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add("visible");
-        obs.unobserve(e.target);
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
       }
     });
   }, { threshold: 0.12 });
-  els.forEach(el => obs.observe(el));
+
+  els.forEach(el => observer.observe(el));
 }
 
-// ── TABS ───────────────────────────────
 function showTab(tabId) {
-  document.querySelectorAll(".tab-panel").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById(tabId).classList.add("active");
-  const btnId = tabId === "encoder" ? "tabEncode" : "tabDecode";
-  document.getElementById(btnId).classList.add("active");
+  document.querySelectorAll(".tab-panel").forEach(tab => tab.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(button => {
+    button.classList.remove("active");
+    button.setAttribute("aria-selected", "false");
+  });
+
+  const panel = document.getElementById(tabId);
+  if (panel) panel.classList.add("active");
+
+  const buttonId = tabId === "encoder" ? "tabEncode" : "tabDecode";
+  const button = document.getElementById(buttonId);
+  if (button) {
+    button.classList.add("active");
+    button.setAttribute("aria-selected", "true");
+  }
 }
 
-// ── CIPHER TABLES ──────────────────────
-const alphabet  = " abcdefghijklmnopqrstuvwxyz.!?@#:/()";
-const colors    = ["white","red","blue","green","orange","yellow"];
-const colorHex  = {
-  white:"#FFFFFF", red:"#C41E3A", blue:"#0051BA",
-  green:"#009E60", orange:"#FF5800", yellow:"#FFD500"
+const alphabet = " abcdefghijklmnopqrstuvwxyz.!?@#:/()";
+const colors = ["white", "red", "blue", "green", "orange", "yellow"];
+const colorHex = {
+  white: "#FFFFFF",
+  red: "#C41E3A",
+  blue: "#0051BA",
+  green: "#009E60",
+  orange: "#FF5800",
+  yellow: "#FFD500",
 };
-const colorShort = { w:"white", r:"red", b:"blue", g:"green", o:"orange", y:"yellow" };
+const colorShort = { w: "white", r: "red", b: "blue", g: "green", o: "orange", y: "yellow" };
 
-const charToPair = {}, pairToChar = {};
+const charToPair = {};
+const pairToChar = {};
 let idx = 0;
 for (let d1 = 0; d1 < 6; d1++) {
   for (let d2 = 0; d2 < 6; d2++) {
     if (idx < alphabet.length) {
-      const ch   = alphabet[idx];
+      const ch = alphabet[idx];
       const pair = [colors[d1], colors[d2]];
-      charToPair[ch]         = pair;
+      charToPair[ch] = pair;
       pairToChar[pair.join("|")] = ch;
       idx++;
     }
@@ -143,19 +250,18 @@ for (let d1 = 0; d1 < 6; d1++) {
 }
 
 const positions = [
-  [0,0],[0,1],[0,2],
-  [1,0],     [1,2],
-  [2,0],[2,1],[2,2]
+  [0, 0], [0, 1], [0, 2],
+  [1, 0],         [1, 2],
+  [2, 0], [2, 1], [2, 2],
 ];
 
-// ── ENCODE ─────────────────────────────
 function encode() {
-  const input    = document.getElementById("message").value.toLowerCase();
+  const input = document.getElementById("message").value.toLowerCase();
   const errorBox = document.getElementById("encodeError");
-  const cleaned  = [...input];
+  const cleaned = [...input];
 
-  if (cleaned.some(c => !alphabet.includes(c))) {
-    errorBox.innerText = "ERROR: INVALID_CHAR detected. Allowed: a-z space . ! ? @ # : / ( )";
+  if (cleaned.some(char => !alphabet.includes(char))) {
+    errorBox.innerText = "ERROR: INVALID_CHAR. Allowed: a-z space . ! ? @ # : / ( )";
     document.getElementById("faces").innerHTML = "";
     document.getElementById("colorCodes").value = "";
     return;
@@ -165,8 +271,8 @@ function encode() {
   const blocks = [];
 
   for (let i = 0; i < cleaned.length; i += 4) {
-    const chunk = cleaned.slice(i, i+4).join("").padEnd(4," ");
-    const flat  = [];
+    const chunk = cleaned.slice(i, i + 4).join("").padEnd(4, " ");
+    const flat = [];
     for (const char of chunk) flat.push(...charToPair[char]);
     blocks.push(flat);
   }
@@ -175,178 +281,178 @@ function encode() {
   generateColorCodes(blocks);
 }
 
-// ── RENDER CUBES ───────────────────────
 function renderFaces(blocks, container) {
   container.innerHTML = "";
-  blocks.forEach((block, bIdx) => {
-    const grid = Array.from({length:3}, () => Array(3).fill(""));
-    positions.forEach(([r,c], i) => grid[r][c] = block[i]);
+
+  blocks.forEach((block, blockIndex) => {
+    const grid = Array.from({ length: 3 }, () => Array(3).fill(""));
+    positions.forEach(([row, col], posIndex) => {
+      grid[row][col] = block[posIndex];
+    });
     grid[1][1] = "white";
 
     const table = document.createElement("table");
     table.className = "cube";
-    table.style.animationDelay = `${bIdx * 0.06}s`;
+    table.setAttribute("aria-label", `Encoded cube face ${blockIndex + 1}`);
+    table.style.animationDelay = `${blockIndex * 70}ms`;
 
-    for (const row of grid) {
+    grid.forEach((row, rowIndex) => {
       const tr = document.createElement("tr");
-      for (const color of row) {
-        const td  = document.createElement("td");
-        const hex = colorHex[color] || "#111";
-        td.style.backgroundColor = hex;
-        // Sombra inset plástica 90s
-        td.style.boxShadow = `inset 3px 3px 5px rgba(255,255,255,0.35), inset -2px -2px 4px rgba(0,0,0,0.5)`;
-
-        const lbl = document.createElement("div");
-        lbl.className = "color-label";
-        lbl.innerText = color ? color[0].toUpperCase() : "X";
-        lbl.style.color = color === "white" ? "#444" : "rgba(255,255,255,0.9)";
-        td.appendChild(lbl);
+      row.forEach((color, colIndex) => {
+        const td = buildStickerCell(color, blockIndex, rowIndex * 3 + colIndex);
         tr.appendChild(td);
-      }
+      });
       table.appendChild(tr);
-    }
+    });
+
     container.appendChild(table);
   });
 }
 
-// ── COLOR CODES ────────────────────────
+function buildStickerCell(color, blockIndex, cellIndex) {
+  const td = document.createElement("td");
+  const hex = colorHex[color] || "#111111";
+  td.style.backgroundColor = hex;
+  td.style.animationDelay = `${blockIndex * 70 + cellIndex * 24}ms`;
+  td.title = color || "empty";
+
+  const label = document.createElement("div");
+  label.className = "color-label";
+  label.innerText = color ? color[0].toUpperCase() : "X";
+  label.style.color = color === "white" ? "#3b3b3b" : "rgba(255, 255, 255, 0.94)";
+  td.appendChild(label);
+
+  return td;
+}
+
 function generateColorCodes(blocks) {
   const codes = blocks.map(block => {
     const grid = Array(9).fill("x");
-    positions.forEach(([r,c], i) => { grid[r*3+c] = block[i][0]; });
+    positions.forEach(([row, col], posIndex) => {
+      grid[row * 3 + col] = block[posIndex][0];
+    });
     grid[4] = "w";
     return grid.join("");
   });
   document.getElementById("colorCodes").value = codes.join(" ");
 }
 
-// ── COPY ───────────────────────────────
 function copyColorCodes() {
-  const ta = document.getElementById("colorCodes");
+  const textarea = document.getElementById("colorCodes");
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(ta.value).catch(() => fallbackCopy(ta));
+    navigator.clipboard.writeText(textarea.value).catch(() => fallbackCopy(textarea));
   } else {
-    fallbackCopy(ta);
+    fallbackCopy(textarea);
   }
-  // Flash 90s: cambia borde a amarillo instantáneo, sin transition
-  ta.style.borderColor = "#FFFF00";
-  ta.style.color = "#FFFF00";
+
+  textarea.style.boxShadow = "0 0 0 2px #ffe100, 0 0 22px rgba(255, 225, 0, 0.62)";
   setTimeout(() => {
-    ta.style.borderColor = "";
-    ta.style.color = "";
-  }, 400);
+    textarea.style.boxShadow = "";
+  }, 420);
 }
 
-function fallbackCopy(ta) {
-  ta.select();
+function fallbackCopy(textarea) {
+  textarea.select();
   document.execCommand("copy");
 }
 
-// ── RESETS ─────────────────────────────
 function resetEncoder() {
-  document.getElementById("message").value        = "";
-  document.getElementById("faces").innerHTML      = "";
-  document.getElementById("colorCodes").value     = "";
-  document.getElementById("encodeError").innerText= "";
+  document.getElementById("message").value = "";
+  document.getElementById("faces").innerHTML = "";
+  document.getElementById("colorCodes").value = "";
+  document.getElementById("encodeError").innerText = "";
 }
 
 function resetDecoder() {
-  document.getElementById("colorInput").value        = "";
-  document.getElementById("decodedFaces").innerHTML  = "";
+  document.getElementById("colorInput").value = "";
+  document.getElementById("decodedFaces").innerHTML = "";
   document.getElementById("decodedOutput").innerText = "";
-  document.getElementById("decodeErrors").innerText  = "";
+  document.getElementById("decodeErrors").innerText = "";
 }
 
-// ── AUTO SPACE + DECODE ────────────────
 function autoSpaceAndDecode(el) {
-  const start    = el.selectionStart;
+  const start = el.selectionStart;
   const oldValue = el.value;
-  const cleaned  = oldValue.replace(/[^wrbgoy]/gi, "").toLowerCase();
+  const cleaned = oldValue.replace(/[^wrbgoy]/gi, "").toLowerCase();
   const newValue = cleaned.replace(/(.{9})(?!\s)/g, "$1 ").trimEnd();
 
   if (el.value !== newValue) {
     el.value = newValue;
     const diff = newValue.length - oldValue.length;
-    el.setSelectionRange(start + diff, start + diff);
-    // Flash amarillo instantáneo (sin transition)
-    el.style.borderColor = "#FFFF00";
-    setTimeout(() => el.style.borderColor = "", 250);
+    el.setSelectionRange(Math.max(0, start + diff), Math.max(0, start + diff));
+    el.style.boxShadow = "0 0 0 2px #ffe100";
+    setTimeout(() => {
+      el.style.boxShadow = "";
+    }, 250);
   }
+
   liveDecodePreview();
 }
 
-// ── LIVE DECODE ────────────────────────
 function liveDecodePreview() {
-  const input         = document.getElementById("colorInput").value.toLowerCase().trim();
-  const parts         = input.split(/\s+/).filter(Boolean);
+  const input = document.getElementById("colorInput").value.toLowerCase().trim();
+  const parts = input.split(/\s+/).filter(Boolean);
   const faceContainer = document.getElementById("decodedFaces");
-  const outputBox     = document.getElementById("decodedOutput");
-  const errorBox      = document.getElementById("decodeErrors");
+  const outputBox = document.getElementById("decodedOutput");
+  const errorBox = document.getElementById("decodeErrors");
 
   faceContainer.innerHTML = "";
-  outputBox.innerText     = "";
-  errorBox.innerText      = "";
+  outputBox.innerText = "";
+  errorBox.innerText = "";
 
   let output = "";
 
-  parts.forEach((part, pIdx) => {
+  parts.forEach((part, partIndex) => {
     if (part.length > 9) {
-      errorBox.innerText += `ERROR: OVERFLOW in block "${part}"\n`; return;
+      errorBox.innerText += `ERROR: OVERFLOW in block "${part}"\n`;
+      return;
     }
     if (!/^[wrbgoy]*$/.test(part)) {
-      errorBox.innerText += `ERROR: INVALID_CHAR in block "${part}"\n`; return;
+      errorBox.innerText += `ERROR: INVALID_CHAR in block "${part}"\n`;
+      return;
     }
 
     const table = document.createElement("table");
     table.className = "cube";
-    table.style.animationDelay = `${pIdx * 0.06}s`;
+    table.setAttribute("aria-label", `Decoded cube face ${partIndex + 1}`);
+    table.style.animationDelay = `${partIndex * 70}ms`;
 
-    for (let r = 0; r < 3; r++) {
+    for (let row = 0; row < 3; row++) {
       const tr = document.createElement("tr");
-      for (let c = 0; c < 3; c++) {
-        const i   = r * 3 + c;
-        const cl  = part[i] || null;
-        const td  = document.createElement("td");
-        const lbl = document.createElement("div");
-        lbl.className = "color-label";
-
-        if (cl && colorShort[cl]) {
-          const cn  = colorShort[cl];
-          const hex = colorHex[cn];
-          td.style.backgroundColor = hex;
-          td.style.boxShadow = `inset 3px 3px 5px rgba(255,255,255,0.35), inset -2px -2px 4px rgba(0,0,0,0.5)`;
-          lbl.innerText  = cl.toUpperCase();
-          lbl.style.color = cn === "white" ? "#444" : "rgba(255,255,255,0.9)";
-        } else {
-          td.style.backgroundColor = "#111";
-          lbl.innerText  = "X"; lbl.style.color = "#333";
-        }
-
-        td.appendChild(lbl); tr.appendChild(td);
+      for (let col = 0; col < 3; col++) {
+        const cellIndex = row * 3 + col;
+        const shortName = part[cellIndex] || null;
+        const colorName = shortName ? colorShort[shortName] : "";
+        tr.appendChild(buildStickerCell(colorName, partIndex, cellIndex));
       }
       table.appendChild(tr);
     }
     faceContainer.appendChild(table);
 
-    const chars = [...part].filter((_, i) => i !== 4);
+    const chars = [...part].filter((_, index) => index !== 4);
     for (let i = 0; i < chars.length; i += 2) {
-      const a = colorShort[chars[i]];
-      const b = colorShort[chars[i+1]];
-      output += (!a || !b) ? "?" : (pairToChar[`${a}|${b}`] || "?");
+      const first = colorShort[chars[i]];
+      const second = colorShort[chars[i + 1]];
+      output += (!first || !second) ? "?" : (pairToChar[`${first}|${second}`] || "?");
     }
   });
 
-  if (output.trim()) {
-    // Re-trigger animation — 90s typewriter effect
+  const preview = output.replace(/\s+$/g, "");
+  if (preview.length) {
     outputBox.style.animation = "none";
-    void outputBox.offsetWidth; // reflow
+    void outputBox.offsetWidth;
     outputBox.style.animation = "";
-    outputBox.innerText = output.trim();
+    outputBox.innerText = preview;
   }
 }
 
-// ── KEYBOARD SHORTCUTS ─────────────────
-document.addEventListener("keydown", e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === "e") { e.preventDefault(); showTab("encoder"); }
-  if ((e.ctrlKey || e.metaKey) && e.key === "d") { e.preventDefault(); showTab("decoder"); }
+document.addEventListener("keydown", event => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "e") {
+    event.preventDefault();
+    showTab("encoder");
+  }
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "d") {
+    event.preventDefault();
+    showTab("decoder");
+  }
 });

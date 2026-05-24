@@ -1,227 +1,247 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Encode hidden messages in Rubik's Cube faces.">
-  <title>DECUBER :: h4ckxel</title>
+  <meta name="description" content="Decuber codifica y decodifica mensajes usando colores de un cubo Rubik.">
+  <title>DECUBER :: cube color codec</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="assets/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <noscript>
+    <style>
+      #bootScreen { display: none !important; }
+      #mainContent { display: block !important; }
+    </style>
+  </noscript>
 </head>
 <body>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="noise-grid" aria-hidden="true"></div>
 
-  <!-- SCANLINES OVERLAY -->
-  <div class="scanlines"></div>
+  <div id="bootScreen" class="intro-shell" role="dialog" aria-label="Decuber boot intro">
+    <button id="skipIntro" class="skip-intro" type="button">SKIP INTRO</button>
 
-  <!-- BOOT SCREEN -->
-  <div id="bootScreen" class="boot-screen">
-    <div class="boot-content">
-      <div class="boot-logo">D3CUB3R</div>
-      <div class="boot-log" id="bootLog"></div>
-      <div class="boot-cursor">█</div>
+    <div class="intro-layout">
+      <section class="intro-console" aria-label="Boot log">
+        <div class="intro-kicker">DECUBER_BOOT.EXE / CUBE MATRIX LOADER</div>
+        <div class="intro-logo">D3CUB3R</div>
+        <div class="boot-log" id="bootLog"></div>
+        <div class="progress-frame" aria-label="Boot progress">
+          <div class="progress-bar" id="bootProgress"></div>
+        </div>
+        <div class="boot-foot">shareware channel: not secure crypto</div>
+      </section>
+
+      <section class="rubik-stage" aria-label="Rubik cube assembling animation">
+        <div class="stage-label">CUBE_MATRIX_ASSEMBLER</div>
+        <div class="rubik-rig">
+          <div id="introCube" class="intro-cube" aria-hidden="true"></div>
+        </div>
+        <div class="stage-readout">
+          <span>3x3 face lock</span>
+          <span>color bus online</span>
+          <span>flash intro mode</span>
+        </div>
+      </section>
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
   <div id="mainContent" class="main-content hidden">
-
-    <!-- HEADER -->
     <header class="site-header">
-      <div>
-        <div class="logo-block">
-          <span class="logo-bracket">[</span>
-          <span class="logo-text glitch-text" data-text="DECUBER">DECUBER</span>
-          <span class="logo-bracket">]</span>
+      <div class="brand-panel">
+        <div class="badge-row">
+          <span class="badge">CYBERCAFE BUILD 2003</span>
+          <span class="badge badge-hot">NO SECURE CRYPTO</span>
         </div>
-        <div class="logo-sub">CUBE_CIPHER_v2.0 :: by h4ckxel</div>
+        <h1 class="logo-text" data-text="DECUBER">DECUBER</h1>
+        <p class="logo-sub">Rubik color message codec / by h4ckxel</p>
       </div>
-      <div class="header-right">
+
+      <div class="header-widget">
+        <div class="widget-title">SYSTEM STATUS</div>
         <div class="status-line">
           <span class="status-dot"></span>
-          <span class="status-text" id="statusText">SYS_ONLINE</span>
+          <span id="statusText">SYS_ONLINE</span>
         </div>
         <div class="sys-info">
           <span id="clockDisplay">00:00:00</span>
-          &nbsp;::&nbsp;
-          SESSION_<span id="sessionId">????</span>
+          <span>SESSION_<span id="sessionId">??????</span></span>
         </div>
       </div>
     </header>
 
-    <!-- STARS — GeoCities touch -->
-    <div class="star-row" aria-hidden="true">
-      ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★
-    </div>
-
-    <!-- TICKER (marquee-style) -->
-    <div class="ticker-wrap">
+    <div class="ticker-wrap" aria-label="Decuber status ticker">
       <div class="ticker">
-        <span>DECUBER ENCODER ACTIVE &nbsp;///&nbsp; STEGANOGRAPHY MODULE LOADED &nbsp;///&nbsp; RUBIK'S CIPHER ONLINE &nbsp;///&nbsp; ENCODE YOUR SECRETS &nbsp;///&nbsp; 6 COLORS · 36 COMBOS · A-Z + SYMBOLS &nbsp;///&nbsp; CUBE FACES: W R B G O Y &nbsp;///&nbsp; h4ckxel@github &nbsp;///&nbsp; DECUBER ENCODER ACTIVE &nbsp;///&nbsp; STEGANOGRAPHY MODULE LOADED &nbsp;///&nbsp; RUBIK'S CIPHER ONLINE &nbsp;///&nbsp; ENCODE YOUR SECRETS &nbsp;///&nbsp; 6 COLORS · 36 COMBOS · A-Z + SYMBOLS &nbsp;///&nbsp; CUBE FACES: W R B G O Y &nbsp;///&nbsp; h4ckxel@github &nbsp;///&nbsp;</span>
+        <span>DECUBER ENCODER ACTIVE /// RUBIK COLOR BUS /// 6 COLORS / 36 COMBOS /// A-Z SPACE . ! ? @ # : / ( ) /// CUBE MATRIX READY /// PASTE COLORS, RECOVER TEXT /// DECUBER ENCODER ACTIVE /// RUBIK COLOR BUS /// 6 COLORS / 36 COMBOS /// A-Z SPACE . ! ? @ # : / ( ) /// CUBE MATRIX READY /// PASTE COLORS, RECOVER TEXT ///</span>
       </div>
     </div>
 
-    <!-- TERMINAL WINDOW -->
-    <div class="terminal-window">
-
-      <!-- Titlebar Win95 style -->
-      <div class="terminal-titlebar">
-        <div class="terminal-dots">
-          <span class="dot dot-r"></span>
-          <span class="dot dot-y"></span>
-          <span class="dot dot-g"></span>
-        </div>
-        <div class="terminal-title">DECUBER.EXE — [Cube Cipher System v2.0]</div>
-        <div class="terminal-info">PID:1337</div>
-      </div>
-
-      <!-- TAB BAR -->
-      <div class="tab-bar">
-        <button class="tab-btn active" id="tabEncode" onclick="showTab('encoder')">
-          <span class="tab-icon">▶</span>ENCODE.EXE
-        </button>
-        <button class="tab-btn" id="tabDecode" onclick="showTab('decoder')">
-          <span class="tab-icon">▶</span>DECODE.EXE
-        </button>
-        <div class="tab-spacer"></div>
-        <span class="tab-hint">// SELECT MODULE [Ctrl+E / Ctrl+D]</span>
-      </div>
-
-      <!-- ENCODER PANEL -->
-      <div class="tab-panel active" id="encoder">
-
-        <div class="panel-header">
-          <span class="cmd-prompt">C:\DECUBER&gt;</span>
-          <span class="cmd-text"> encode.exe --input <span class="blink-cursor">█</span></span>
-        </div>
-
-        <div class="field-group">
-          <label class="field-label">
-            <span class="label-icon">◈</span>INPUT_MESSAGE
-            <span class="label-hint">[ a–z, space, . ! ? @ # : / ( ) ]</span>
-          </label>
-          <div class="input-wrapper">
-            <span class="input-prefix">&gt;&gt;</span>
-            <input type="text" id="message" placeholder="type your secret message..." oninput="encode()" autocomplete="off" spellcheck="false">
+    <main class="tool-grid">
+      <section class="software-window" aria-label="Decuber encoder and decoder">
+        <div class="window-titlebar">
+          <div class="window-buttons" aria-hidden="true">
+            <span></span><span></span><span></span>
           </div>
-          <div class="error" id="encodeError"></div>
+          <div class="window-title">DECUBER.EXE - Cube Cipher Workstation</div>
+          <div class="window-pid">PID 1337</div>
         </div>
 
-        <div class="section-divider">
-          <span class="divider-text">══ CUBE_MATRIX_OUTPUT ══</span>
+        <div class="tab-bar" role="tablist" aria-label="Decuber modules">
+          <button class="tab-btn active" id="tabEncode" type="button" onclick="showTab('encoder')">ENCODE.EXE</button>
+          <button class="tab-btn" id="tabDecode" type="button" onclick="showTab('decoder')">DECODE.EXE</button>
+          <div class="tab-spacer"></div>
+          <span class="tab-hint">Ctrl+E / Ctrl+D</span>
         </div>
 
-        <div class="faces" id="faces"></div>
+        <div class="tab-panel active" id="encoder" role="tabpanel" aria-labelledby="tabEncode">
+          <div class="panel-header">
+            <span class="cmd-prompt">C:\DECUBER&gt;</span>
+            <span class="cmd-text">encode.exe --mode visual</span>
+          </div>
 
-        <div class="section-divider">
-          <span class="divider-text">══ ENCODED_COLOR_SEQUENCE ══</span>
+          <div class="module-stack">
+            <div class="field-group">
+              <label class="field-label" for="message">
+                INPUT_MESSAGE
+                <span class="label-hint">a-z, space, . ! ? @ # : / ( )</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-prefix">&gt;&gt;</span>
+                <input type="text" id="message" placeholder="type your cube message..." oninput="encode()" autocomplete="off" spellcheck="false">
+              </div>
+              <div class="error" id="encodeError" aria-live="polite"></div>
+            </div>
+
+            <div class="matrix-output">
+              <div class="matrix-title">
+                <span>CUBE_MATRIX_OUTPUT</span>
+                <span>4 chars per face</span>
+              </div>
+              <div class="faces" id="faces"></div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="colorCodes">ENCODED_COLOR_SEQUENCE</label>
+              <textarea id="colorCodes" rows="4" readonly placeholder="// awaiting input..."></textarea>
+            </div>
+
+            <div class="btn-row">
+              <button class="hk-btn hk-btn-primary" type="button" onclick="copyColorCodes()">COPY OUTPUT</button>
+              <button class="hk-btn hk-btn-danger" type="button" onclick="resetEncoder()">CLEAR BUFFER</button>
+            </div>
+          </div>
         </div>
 
-        <div class="field-group">
-          <label class="field-label"><span class="label-icon">◈</span>COLOR_CODES</label>
-          <textarea id="colorCodes" rows="4" readonly placeholder="// awaiting input..."></textarea>
+        <div class="tab-panel" id="decoder" role="tabpanel" aria-labelledby="tabDecode">
+          <div class="panel-header">
+            <span class="cmd-prompt">C:\DECUBER&gt;</span>
+            <span class="cmd-text">decode.exe --seq live</span>
+          </div>
+
+          <div class="module-stack">
+            <div class="field-group">
+              <label class="field-label" for="colorInput">
+                INPUT_SEQUENCE
+                <span class="label-hint">example: rbwywbwbw bgwwwgybg</span>
+              </label>
+              <textarea id="colorInput" rows="4" oninput="autoSpaceAndDecode(this)" placeholder="// paste color sequence here..." spellcheck="false"></textarea>
+              <div class="error" id="decodeErrors" aria-live="polite"></div>
+            </div>
+
+            <div class="decoded-console">
+              <div class="matrix-title">
+                <span>DECODED_MESSAGE</span>
+                <span>live preview</span>
+              </div>
+              <div class="output-block" id="decodedOutput"></div>
+            </div>
+
+            <div class="matrix-output">
+              <div class="matrix-title">
+                <span>DECODED_CUBE_FACES</span>
+                <span>visual audit</span>
+              </div>
+              <div class="faces" id="decodedFaces"></div>
+            </div>
+
+            <div class="btn-row">
+              <button class="hk-btn hk-btn-danger" type="button" onclick="resetDecoder()">CLEAR BUFFER</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side-module" aria-label="Decuber protocol notes">
+        <div class="module-titlebar">DECODER STATION / LIVE NOTES</div>
+        <div class="sticker-board">
+          <span class="sticker sticker-yellow">RUBIK BUS</span>
+          <span class="sticker sticker-blue">XP READY</span>
+          <span class="sticker sticker-red">NOT CRYPTO</span>
         </div>
 
-        <div class="btn-row">
-          <button class="hk-btn hk-btn--primary" onclick="copyColorCodes()">
-            <span class="btn-icon">⊕</span>COPY OUTPUT
-          </button>
-          <button class="hk-btn hk-btn--danger" onclick="resetEncoder()">
-            <span class="btn-icon">⊘</span>CLEAR BUFFER
-          </button>
+        <div class="preview-face" aria-hidden="true">
+          <span style="--c:#FFFFFF"></span>
+          <span style="--c:#C41E3A"></span>
+          <span style="--c:#0051BA"></span>
+          <span style="--c:#009E60"></span>
+          <span style="--c:#FFFFFF"></span>
+          <span style="--c:#FF5800"></span>
+          <span style="--c:#FFD500"></span>
+          <span style="--c:#C41E3A"></span>
+          <span style="--c:#0051BA"></span>
         </div>
 
-      </div><!-- /encoder -->
-
-      <!-- DECODER PANEL -->
-      <div class="tab-panel" id="decoder">
-
-        <div class="panel-header">
-          <span class="cmd-prompt">C:\DECUBER&gt;</span>
-          <span class="cmd-text"> decode.exe --seq <span class="blink-cursor">█</span></span>
+        <div class="protocol-list">
+          <div>
+            <strong>MAP</strong>
+            <span>Each character becomes two cube colors.</span>
+          </div>
+          <div>
+            <strong>PACK</strong>
+            <span>Four characters fill the eight outside stickers.</span>
+          </div>
+          <div>
+            <strong>READ</strong>
+            <span>Center is always white. The rest is scanned left to right.</span>
+          </div>
         </div>
 
-        <div class="field-group">
-          <label class="field-label">
-            <span class="label-icon">◈</span>INPUT_SEQUENCE
-            <span class="label-hint">[ e.g.: rbwywbwbw bgwwwgybg ]</span>
-          </label>
-          <textarea id="colorInput" rows="3" oninput="autoSpaceAndDecode(this)" placeholder="// paste color sequence here..." spellcheck="false"></textarea>
-          <div class="error" id="decodeErrors"></div>
+        <div class="warning-box">
+          Decuber hides messages as color patterns. It is not secure encryption by itself.
         </div>
+      </aside>
+    </main>
 
-        <div class="section-divider">
-          <span class="divider-text">══ DECODED_MESSAGE ══</span>
-        </div>
-
-        <div class="output-block" id="decodedOutput"></div>
-
-        <div class="faces" id="decodedFaces"></div>
-
-        <div class="btn-row">
-          <button class="hk-btn hk-btn--danger" onclick="resetDecoder()">
-            <span class="btn-icon">⊘</span>CLEAR BUFFER
-          </button>
-        </div>
-
-      </div><!-- /decoder -->
-
-    </div><!-- /terminal-window -->
-
-    <!-- HOW IT WORKS — scroll reveal 90s -->
     <section class="info-block reveal-on-scroll">
-      <div class="info-header">
-        ★ CIPHER_PROTOCOL :: HOW IT WORKS ★
-      </div>
+      <div class="info-header">CIPHER_PROTOCOL / HOW IT WORKS</div>
       <div class="info-grid">
-        <div class="info-card">
+        <article class="info-card">
           <div class="info-card-num">STEP 01</div>
-          <div class="info-card-title">MAP</div>
-          <div class="info-card-body">
-            Each character maps to a unique pair of Rubik's cube colors.
-            6×6 = 36 combinations cover A-Z + symbols.
-          </div>
-        </div>
-        <div class="info-card">
+          <h2>Map</h2>
+          <p>Decuber maps every supported character to a unique pair from six Rubik colors.</p>
+        </article>
+        <article class="info-card">
           <div class="info-card-num">STEP 02</div>
-          <div class="info-card-title">PACK</div>
-          <div class="info-card-body">
-            4 chars per cube face. 8 color slots around the center.
-            Center is always WHITE — the anchor cell.
-          </div>
-        </div>
-        <div class="info-card">
+          <h2>Pack</h2>
+          <p>A 3x3 face stores four characters around a white center sticker.</p>
+        </article>
+        <article class="info-card">
           <div class="info-card-num">STEP 03</div>
-          <div class="info-card-title">SEND</div>
-          <div class="info-card-body">
-            Share the color code string. Looks like random noise.
-            Only Decuber knows how to read it.
-          </div>
-        </div>
+          <h2>Decode</h2>
+          <p>Paste color initials back into the decoder and recover the message live.</p>
+        </article>
       </div>
     </section>
 
-    <!-- STARS bottom -->
-    <div class="star-row" aria-hidden="true">
-      ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦
-    </div>
-
-    <!-- FOOTER -->
     <footer class="site-footer">
       <div class="footer-line"></div>
       <div class="footer-content">
-        <span>
-          DECUBER :: CUBE_CIPHER &nbsp;|&nbsp;
-          Made with ♥ by <a href="mailto:h4ckxel@gmail.com">h4ckxel</a>
-        </span>
-        <span>
-          <a href="https://github.com/h4ckxel/Decuber">[ GITHUB SRC ]</a>
-          &nbsp;:: NO_RIGHTS_RESERVED
-        </span>
+        <span>DECUBER :: cube color codec</span>
+        <span><a href="https://github.com/h4ckxel/Decuber">GitHub source</a> / MIT License</span>
       </div>
     </footer>
-
-  </div><!-- /main-content -->
+  </div>
 
   <script src="js/script.js"></script>
 </body>
