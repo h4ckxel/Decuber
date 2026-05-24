@@ -8,3 +8,8 @@ Icon?
 ._*
 .Spotlight-V100
 .Trashes
+
+# Python test/cache output
+__pycache__/
+*.py[cod]
+.pytest_cache/
