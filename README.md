@@ -201,5 +201,3 @@ La suite cubre:
 ## Licencia
 
 MIT License. Ver [LICENSE](LICENSE).
-
-Proyecto original: StegaCube by Christian Lepuschitz. Modificaciones: h4ckxel.
